@@ -12,7 +12,7 @@ public static class ConfigurationDirectoryPicker
     private static readonly string HomeDirectory = Environment.GetFolderPath(
         Environment.SpecialFolder.UserProfile
     );
-    private const string ProgramName = "RepositoresManager";
+    private const string ProgramName = "RepositoriesManager";
 
     public static string PickConfigurationDirectory()
     {
