@@ -18,10 +18,16 @@ public static class ConfigurationDirectoryPicker
     {
         PlatformID osName = Environment.OSVersion.Platform;
 
+        string? xdgConfigHomeValue = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+        if (xdgConfigHomeValue != null)
+        {
+            return xdgConfigHomeValue;
+        }
+
         switch (osName)
         {
             case PlatformID.Unix:
-                return $"{HomeDirectory}/.config{ProgramName}";
+                return $"{HomeDirectory}/.config/{ProgramName}";
             case PlatformID.Win32S:
             case PlatformID.Win32Windows:
             case PlatformID.WinCE:
