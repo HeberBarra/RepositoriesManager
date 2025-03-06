@@ -10,6 +10,7 @@ using RepositoriesManager.configurator.information;
 
 Configurator configurator = new();
 configurator.ReadConfiguration();
+configurator.WatchConfigurationFile();
 
 foreach (Repository repository in configurator.ListRepositories())
 {

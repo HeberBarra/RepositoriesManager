@@ -12,8 +12,8 @@ namespace RepositoriesManager.configurator.information;
 public class ConfigurationInformation()
 {
     [JsonPropertyName("$schema")]
-    public string Schema { get; set; } = "config.schema.json";
-    public string TargetInstallDirectory { get; set; } =
+    public string Schema { get; init; } = "config.schema.json";
+    public string TargetInstallDirectory { get; init; } =
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/bin";
-    public List<Repository> Repositories { get; set; } = [];
+    public List<Repository> Repositories { get; init; } = [];
 }

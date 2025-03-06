@@ -59,6 +59,7 @@ public class Configurator
         if (configuration != null)
         {
             _configurationInformation = configuration;
+            return;
         }
 
         Console.WriteLine(
@@ -67,8 +68,18 @@ public class Configurator
         Environment.Exit(1);
     }
 
+    private void ReloadConfiguration(object sender, FileSystemEventArgs eventArgs)
+    {
+        ReadConfiguration();
+    }
+
     public List<Repository> ListRepositories()
     {
         return _configurationInformation.Repositories;
+    }
+
+    public void WatchConfigurationFile()
+    {
+        ConfigurationWatcher.StartWatchingFile(ConfigurationDirectory, ReloadConfiguration);
     }
 }
