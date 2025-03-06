@@ -18,7 +18,7 @@ public class Configurator
 
     private readonly string _configurationFile = $"{ConfigurationDirectory}/config.json";
 
-    private readonly ConfigurationInformation _configurationInformation = new();
+    private ConfigurationInformation _configurationInformation = new();
 
     public Configurator()
     {
@@ -48,5 +48,27 @@ public class Configurator
             JsonNode.Parse(JsonSerializer.Serialize(_configurationInformation))?.ToString()
             ?? string.Empty;
         File.WriteAllText(_configurationFile, baseConfiguration);
+    }
+
+    public void ReadConfiguration()
+    {
+        string configurationFileContent = File.ReadAllText(_configurationFile);
+        ConfigurationInformation? configuration =
+            JsonSerializer.Deserialize<ConfigurationInformation>(configurationFileContent);
+
+        if (configuration != null)
+        {
+            _configurationInformation = configuration;
+        }
+
+        Console.WriteLine(
+            "Configuration couldn't be loaded, please verify your configuration. Terminating program..."
+        );
+        Environment.Exit(1);
+    }
+
+    public List<Repository> ListRepositories()
+    {
+        return _configurationInformation.Repositories;
     }
 }
