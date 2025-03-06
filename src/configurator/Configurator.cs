@@ -36,6 +36,8 @@ public class Configurator
 
     private void CreateConfigurationFile()
     {
+        SchemaCreator.CreateConfigurationJsonSchema($"{ConfigurationDirectory}/config.schema.json");
+
         if (File.Exists(_configurationFile))
         {
             return;
