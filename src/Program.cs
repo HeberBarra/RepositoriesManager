@@ -1,3 +1,3 @@
 ﻿using RepositoriesManager.configurator;
 
-Console.WriteLine(ConfigurationDirectoryPicker.PickConfigurationDirectory());
+Configurator configurator = new Configurator();
