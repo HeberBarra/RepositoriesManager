@@ -6,13 +6,15 @@
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
 using RepositoriesManager.configurator;
-using RepositoriesManager.configurator.information;
+using RepositoriesManager.repository;
 
 Configurator configurator = new();
 configurator.ReadConfiguration();
 configurator.WatchConfigurationFile();
 
-foreach (Repository repository in configurator.ListRepositories())
-{
-    Console.WriteLine(repository);
-}
+RepositoryCloner repositoryCloner = new(
+    configurator.ListRepositories(),
+    RepositoriesDirectoryPicker.PickRepositoriesDirectory()
+);
+
+repositoryCloner.CloneRepositories();
