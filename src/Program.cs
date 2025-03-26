@@ -8,6 +8,10 @@
 using RepositoriesManager.configurator;
 using RepositoriesManager.repository;
 
+Console.WriteLine(
+    "To avoid problems, please assert that your global .gitignore is properly configured to ignore .hfb_repo_manager.ps1 or .hfb_repo_manager.sh"
+);
+
 Configurator configurator = new();
 configurator.ReadConfiguration();
 configurator.WatchConfigurationFile();
