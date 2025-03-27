@@ -21,4 +21,22 @@ RepositoryCloner repositoryCloner = new(
     RepositoriesDirectoryPicker.PickRepositoriesDirectory()
 );
 
-repositoryCloner.CloneRepositories();
+RepositoryBuilder repositoryBuilder = new(
+    configurator.ListRepositories(),
+    RepositoriesDirectoryPicker.PickRepositoriesDirectory()
+);
+
+foreach (string commandLineArg in Environment.GetCommandLineArgs())
+{
+    switch (commandLineArg)
+    {
+        case "--clone":
+            repositoryCloner.CloneRepositories();
+            break;
+
+        case "--build":
+            Console.WriteLine("Here");
+            repositoryBuilder.BuildRepositories();
+            break;
+    }
+}
