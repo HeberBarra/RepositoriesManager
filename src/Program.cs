@@ -16,27 +16,33 @@ Configurator configurator = new();
 configurator.ReadConfiguration();
 configurator.WatchConfigurationFile();
 
-RepositoryCloner repositoryCloner = new(
+ManagerRepositories managerRepositories = new(
     configurator.ListRepositories(),
-    RepositoriesDirectoryPicker.PickRepositoriesDirectory()
-);
-
-RepositoryBuilder repositoryBuilder = new(
-    configurator.ListRepositories(),
-    RepositoriesDirectoryPicker.PickRepositoriesDirectory()
+    RepositoriesDirectoryPicker.PickRepositoriesDirectory(),
+    configurator.ConfigurationInformation.TargetInstallDirectory
 );
 
 foreach (string commandLineArg in Environment.GetCommandLineArgs())
 {
+    if (commandLineArg == Environment.GetCommandLineArgs()[0])
+        continue;
+
     switch (commandLineArg)
     {
         case "--clone":
-            repositoryCloner.CloneRepositories();
+            managerRepositories.CloneRepositories();
             break;
 
-        case "--build":
-            Console.WriteLine("Here");
-            repositoryBuilder.BuildRepositories();
+        case "--buildAll":
+            managerRepositories.BuildAllRepositories();
+            break;
+
+        case "--install":
+            managerRepositories.InstallRepositoriesTargets();
+            break;
+
+        default:
+            Console.WriteLine($"{commandLineArg} is invalid.");
             break;
     }
 }

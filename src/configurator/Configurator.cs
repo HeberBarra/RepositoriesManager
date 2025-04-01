@@ -18,7 +18,7 @@ public class Configurator
 
     private readonly string _configurationFile = $"{ConfigurationDirectory}/config.json";
 
-    private ConfigurationInformation _configurationInformation = new();
+    public ConfigurationInformation ConfigurationInformation { get; private set; } = new();
 
     public Configurator()
     {
@@ -45,7 +45,7 @@ public class Configurator
 
         File.Create(_configurationFile).Close();
         string baseConfiguration =
-            JsonNode.Parse(JsonSerializer.Serialize(_configurationInformation))?.ToString()
+            JsonNode.Parse(JsonSerializer.Serialize(ConfigurationInformation))?.ToString()
             ?? string.Empty;
         File.WriteAllText(_configurationFile, baseConfiguration);
     }
@@ -58,7 +58,7 @@ public class Configurator
 
         if (configuration != null)
         {
-            _configurationInformation = configuration;
+            ConfigurationInformation = configuration;
             return;
         }
 
@@ -75,7 +75,7 @@ public class Configurator
 
     public List<Repository> ListRepositories()
     {
-        return _configurationInformation.Repositories;
+        return ConfigurationInformation.Repositories;
     }
 
     public void WatchConfigurationFile()
