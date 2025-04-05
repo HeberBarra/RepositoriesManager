@@ -6,16 +6,21 @@
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
 using System.Diagnostics;
-using RepositoriesManager.configurator.information;
 
 namespace RepositoriesManager.repository;
 
-public class RepositoryCloner(List<Repository> repositories, string targetDirectory)
+public class RepositoryCloner(List<Repository> repositories, string repositoriesDirectory)
+    : IRepositoryCloner
 {
     private List<Repository> Repositories { get; } = repositories;
-    private string TargetDirectory { get; } = targetDirectory;
+    private string RepositoriesDirectory { get; } = repositoriesDirectory;
 
-    public void CloneRepositories()
+    public void Clone(Repository repository)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CloneAllRepositories()
     {
         foreach (Repository repository in Repositories)
         {
@@ -24,7 +29,7 @@ public class RepositoryCloner(List<Repository> repositories, string targetDirect
                 repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
 
             processStartInfo.Arguments =
-                $"clone {repository.Url} {TargetDirectory}/{repositoryName}";
+                $"clone {repository.Url} {RepositoriesDirectory}/{repositoryName}";
 
             Process process = new();
             process.StartInfo = processStartInfo;

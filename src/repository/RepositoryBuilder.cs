@@ -6,18 +6,23 @@
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
 using System.Diagnostics;
-using RepositoriesManager.configurator.information;
 
 namespace RepositoriesManager.repository;
 
-public class RepositoryBuilder(List<Repository> repositories, string reposDirectory)
+public class RepositoryBuilder(List<Repository> repositories, string repositoriesDirectory)
+    : IRepositoryBuilder
 {
     private const string BuildFileBash = ".hfb_repo_manager.sh";
     private const string BuildFilePwsh = ".hfb_repo_manager.ps1";
     private List<Repository> Repositories { get; } = repositories;
-    private string ReposDirectory { get; } = reposDirectory;
+    private string RepositoriesDirectory { get; } = repositoriesDirectory;
 
-    public void BuildRepositories()
+    public void Build(Repository repository)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void BuildAllRepositories()
     {
         ProcessStartInfo startInfoBuildBash = new()
         {
@@ -36,7 +41,7 @@ public class RepositoryBuilder(List<Repository> repositories, string reposDirect
             )
         )
         {
-            Directory.SetCurrentDirectory($"{ReposDirectory}/{repositoryName}");
+            Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repositoryName}");
 
             string[] currentDirectoryFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
 

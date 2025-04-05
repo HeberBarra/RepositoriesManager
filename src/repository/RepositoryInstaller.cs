@@ -5,38 +5,41 @@
 // A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
-using RepositoriesManager.configurator.information;
-
 namespace RepositoriesManager.repository;
 
 public class RepositoryInstaller(
     List<Repository> repositories,
     string repositoriesDirectory,
-    string installationDirectory
-)
+    string targetInstallationDirectory
+) : IRepositoryInstaller
 {
-    private readonly List<Repository> _repositories = repositories;
-    private readonly string _repositoriesDirectory = repositoriesDirectory;
-    private readonly string _installationDirectory = installationDirectory;
+    private List<Repository> Repositories { get; } = repositories;
+    private string RepositoriesDirectory { get; } = repositoriesDirectory;
+    private string TargetInstallationDirectory { get; } = targetInstallationDirectory;
 
-    public void InstallTargets()
+    public void Install(Repository repository)
     {
-        foreach (Repository repository in _repositories)
+        throw new NotImplementedException();
+    }
+
+    public void InstallAllRepositories()
+    {
+        foreach (Repository repository in Repositories)
         {
             if (
                 repository.ExecutableFile == string.Empty
                 || !File.Exists(
-                    $"{_repositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
+                    $"{RepositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
                 )
             )
                 continue;
 
-            Directory.CreateDirectory(_installationDirectory);
+            Directory.CreateDirectory(TargetInstallationDirectory);
             try
             {
                 File.CreateSymbolicLink(
-                    $"{_installationDirectory}/{repository.ExecutableFile}",
-                    $"{_repositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
+                    $"{TargetInstallationDirectory}/{repository.ExecutableFile}",
+                    $"{RepositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
                 );
             }
             catch (IOException)
