@@ -5,81 +5,84 @@
 // A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using RepositoriesManager.configurator.information;
+using RepositoriesManager.repository;
 
 namespace RepositoriesManager.configurator;
 
-public class Configurator
+public class Configurator : IConfigurator
 {
-    private static readonly string ConfigurationDirectory =
-        ConfigurationDirectoryPicker.PickConfigurationDirectory();
+    private ConfigurationInformation? _configurationInformation;
+    private readonly IConfigurationCreator _configurationCreator;
+    private readonly IConfigurationDirectoryPicker _configurationDirectoryPicker;
+    private readonly IConfigurationReader _configurationReader;
+    private readonly IConfigurationVerifier _configurationVerifier;
 
-    private readonly string _configurationFile = $"{ConfigurationDirectory}/config.json";
-
-    public ConfigurationInformation ConfigurationInformation { get; private set; } = new();
-
-    public Configurator()
+    public Configurator(
+        ConfigurationInformation configurationInformation,
+        IConfigurationCreator configurationCreator,
+        IConfigurationDirectoryPicker configurationDirectoryPicker,
+        IConfigurationReader configurationReader,
+        IConfigurationVerifier configurationVerifier
+    )
     {
-        CreateDirectories();
-        CreateConfigurationFile();
+        _configurationInformation = configurationInformation;
+        _configurationCreator = configurationCreator;
+        _configurationDirectoryPicker = configurationDirectoryPicker;
+        _configurationReader = configurationReader;
+        _configurationVerifier = configurationVerifier;
     }
 
-    private static void CreateDirectories()
+    public Configurator(IConfigurationDirectoryPicker configurationDirectoryPicker)
     {
-        string repositoriesDirectory = RepositoriesDirectoryPicker.PickRepositoriesDirectory();
-
-        Directory.CreateDirectory(ConfigurationDirectory);
-        Directory.CreateDirectory(repositoriesDirectory);
+        string configurationDirectory = configurationDirectoryPicker.PickConfigurationDirectory();
+        _configurationDirectoryPicker = configurationDirectoryPicker;
+        _configurationCreator = new ConfigurationCreator(configurationDirectory);
+        _configurationReader = new ConfiguratorReader(configurationDirectory);
+        _configurationVerifier = new ConfigurationVerifier();
     }
 
-    private void CreateConfigurationFile()
+    public List<Repository> GetRepositories()
     {
-        SchemaCreator.CreateConfigurationJsonSchema($"{ConfigurationDirectory}/config.schema.json");
+        return _configurationInformation?.Repositories ?? [];
+    }
 
-        if (File.Exists(_configurationFile))
-        {
-            return;
-        }
+    public string GetRepositoriesDirectory()
+    {
+        return _configurationInformation?.RepositoriesDirectory ?? string.Empty;
+    }
 
-        File.Create(_configurationFile).Close();
-        string baseConfiguration =
-            JsonNode.Parse(JsonSerializer.Serialize(ConfigurationInformation))?.ToString()
-            ?? string.Empty;
-        File.WriteAllText(_configurationFile, baseConfiguration);
+    public string GetTargetInstallDirectory()
+    {
+        return _configurationInformation?.TargetInstallDirectory ?? string.Empty;
+    }
+
+    public void CreateConfiguration()
+    {
+        _configurationCreator.CreateConfigurationSchemaFile();
+        _configurationCreator.CreateConfigurationFile();
     }
 
     public void ReadConfiguration()
     {
-        string configurationFileContent = File.ReadAllText(_configurationFile);
-        ConfigurationInformation? configuration =
-            JsonSerializer.Deserialize<ConfigurationInformation>(configurationFileContent);
-
-        if (configuration != null)
-        {
-            ConfigurationInformation = configuration;
-            return;
-        }
-
-        Console.WriteLine(
-            "Configuration couldn't be loaded, please verify your configuration. Terminating program..."
-        );
-        Environment.Exit(1);
+        _configurationInformation = _configurationReader.Read();
     }
 
-    private void ReloadConfiguration(object sender, FileSystemEventArgs eventArgs)
+    private void ReloadConfiguration(object obj, FileSystemEventArgs args)
     {
         ReadConfiguration();
     }
 
-    public List<Repository> ListRepositories()
+    public void StartWatchingConfiguration()
     {
-        return ConfigurationInformation.Repositories;
+        _configurationReader.StartWatching(
+            _configurationDirectoryPicker.PickConfigurationDirectory(),
+            ReloadConfiguration
+        );
     }
 
-    public void WatchConfigurationFile()
+    public bool VerifyConfiguration()
     {
-        ConfigurationWatcher.StartWatchingFile(ConfigurationDirectory, ReloadConfiguration);
+        return _configurationInformation != null
+            && _configurationVerifier.Verify(_configurationInformation);
     }
 }

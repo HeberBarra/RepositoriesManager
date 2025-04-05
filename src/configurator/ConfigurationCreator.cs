@@ -5,15 +5,43 @@
 // A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
 namespace RepositoriesManager.configurator;
 
-public static class SchemaCreator
+public class ConfigurationCreator(string configurationDirectory) : IConfigurationCreator
 {
-    public static void CreateConfigurationJsonSchema(string targetFile)
+    private ConfigurationInformation? ConfigurationInformation { get; set; }
+
+    private static void CreateConfigurationDirectory(string directory)
     {
-        File.Create(targetFile).Close();
+        Directory.CreateDirectory(directory);
+    }
+
+    public void CreateConfigurationFile()
+    {
+        CreateConfigurationDirectory(configurationDirectory);
+
+        string configurationFile = configurationDirectory + "/config.json";
+        if (File.Exists(configurationFile))
+            return;
+
+        string baseConfiguration =
+            JsonNode.Parse(JsonSerializer.Serialize(ConfigurationInformation))?.ToString()
+            ?? string.Empty;
+
+        File.Create(configurationFile).Close();
+        File.WriteAllText(configurationFile, baseConfiguration);
+    }
+
+    public void CreateConfigurationSchemaFile()
+    {
+        CreateConfigurationDirectory(configurationDirectory);
+        string schemaFile = configurationDirectory + "/config.schema.json";
+        File.Create(schemaFile).Close();
         File.WriteAllText(
-            targetFile,
+            schemaFile,
             """
             {
               "$id": "",
@@ -21,6 +49,10 @@ public static class SchemaCreator
               "title": "Configuration JSON Schema for Heber's Repositories Manager",
               "type": "object",
               "properties": {
+                "RepositoriesDirectory" : {
+                  "type": "string",
+                  "description": "The directory to which the repositories will be cloned."
+                },
                 "TargetInstallDirectory": {
                   "type": "string",
                   "description": "The directory to which the compiled files should be linked to."

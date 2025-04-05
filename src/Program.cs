@@ -12,37 +12,9 @@ Console.WriteLine(
     "To avoid problems, please assert that your global .gitignore is properly configured to ignore .hfb_repo_manager.ps1 or .hfb_repo_manager.sh"
 );
 
-Configurator configurator = new();
+IConfigurationDirectoryPicker configurationDirectoryPicker = new ConfigurationDirectoryPicker();
+IConfigurator configurator = new Configurator(configurationDirectoryPicker);
+
+configurator.CreateConfiguration();
 configurator.ReadConfiguration();
-configurator.WatchConfigurationFile();
-
-ManagerRepositories managerRepositories = new(
-    configurator.ListRepositories(),
-    RepositoriesDirectoryPicker.PickRepositoriesDirectory(),
-    configurator.ConfigurationInformation.TargetInstallDirectory
-);
-
-foreach (string commandLineArg in Environment.GetCommandLineArgs())
-{
-    if (commandLineArg == Environment.GetCommandLineArgs()[0])
-        continue;
-
-    switch (commandLineArg)
-    {
-        case "--clone":
-            managerRepositories.CloneRepositories();
-            break;
-
-        case "--buildAll":
-            managerRepositories.BuildAllRepositories();
-            break;
-
-        case "--install":
-            managerRepositories.InstallRepositoriesTargets();
-            break;
-
-        default:
-            Console.WriteLine($"{commandLineArg} is invalid.");
-            break;
-    }
-}
+configurator.StartWatchingConfiguration();

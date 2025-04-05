@@ -5,15 +5,11 @@
 // A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
-using System.Text.Json.Serialization;
+namespace RepositoriesManager.configurator;
 
-namespace RepositoriesManager.configurator.information;
-
-public class ConfigurationInformation()
+public interface IConfigurationReader
 {
-    [JsonPropertyName("$schema")]
-    public string Schema { get; init; } = "config.schema.json";
-    public string TargetInstallDirectory { get; init; } =
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/bin";
-    public List<Repository> Repositories { get; init; } = [];
+    public ConfigurationInformation Read();
+
+    public void StartWatching(string directory, FileSystemEventHandler callback);
 }

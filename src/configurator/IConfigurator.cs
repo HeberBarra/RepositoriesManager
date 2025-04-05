@@ -4,20 +4,23 @@
 // https://choosealicense.com/licenses/mit/
 // A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be distributed under different terms and without source code.
+using RepositoriesManager.repository;
 
 namespace RepositoriesManager.configurator;
 
-public static class ConfigurationWatcher
+public interface IConfigurator
 {
-    private static FileSystemWatcher? _fileSystemWatcher;
+    public List<Repository> GetRepositories();
 
-    public static void StartWatchingFile(
-        string configurationDirectory,
-        FileSystemEventHandler callbackMethod
-    )
-    {
-        _fileSystemWatcher = new FileSystemWatcher(configurationDirectory);
-        _fileSystemWatcher.NotifyFilter = NotifyFilters.FileName;
-        _fileSystemWatcher.Changed += callbackMethod;
-    }
+    public string GetRepositoriesDirectory();
+
+    public string GetTargetInstallDirectory();
+
+    public void CreateConfiguration();
+
+    public void ReadConfiguration();
+
+    public void StartWatchingConfiguration();
+
+    public bool VerifyConfiguration();
 }

@@ -7,14 +7,14 @@
 
 namespace RepositoriesManager.configurator;
 
-public static class ConfigurationDirectoryPicker
+public class ConfigurationDirectoryPicker : IConfigurationDirectoryPicker
 {
-    private static readonly string HomeDirectory = Environment.GetFolderPath(
+    private readonly string _homeDirectory = Environment.GetFolderPath(
         Environment.SpecialFolder.UserProfile
     );
     private const string ProgramName = "RepositoriesManager";
 
-    public static string PickConfigurationDirectory()
+    public string PickConfigurationDirectory()
     {
         PlatformID osName = Environment.OSVersion.Platform;
 
@@ -27,14 +27,14 @@ public static class ConfigurationDirectoryPicker
         switch (osName)
         {
             case PlatformID.Unix:
-                return $"{HomeDirectory}/.config/{ProgramName}";
+                return $"{_homeDirectory}/.config/{ProgramName}";
             case PlatformID.Win32S:
             case PlatformID.Win32Windows:
             case PlatformID.WinCE:
             case PlatformID.Win32NT:
                 return $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/{ProgramName}";
             case PlatformID.MacOSX:
-                return $"{HomeDirectory}/Library/Preferences/{ProgramName}";
+                return $"{_homeDirectory}/Library/Preferences/{ProgramName}";
             case PlatformID.Xbox:
             case PlatformID.Other:
             default:
