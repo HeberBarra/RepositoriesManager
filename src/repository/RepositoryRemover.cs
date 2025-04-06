@@ -44,15 +44,26 @@ public class RepositoryRemover(
         }
     }
 
+    private string GetRepositoryDirectory(Repository repository)
+    {
+        string repositoryName =
+            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
+
+        if (RepositoriesDirectory.EndsWith('/'))
+        {
+            return $"{RepositoriesDirectory}{repositoryName}";
+        }
+        else
+        {
+            return $"{RepositoriesDirectory}/{repositoryName}";
+        }
+    }
+
     public void RemoveUnknownRepositories()
     {
         string[] repositoriesDirectories = Directory.GetDirectories(RepositoriesDirectory);
         List<string> repositoriesNames = [];
-        repositoriesNames.AddRange(
-            Repositories.Select(repository =>
-                repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1]
-            )
-        );
+        repositoriesNames.AddRange(Repositories.Select(GetRepositoryDirectory));
 
         foreach (string repositoryDirectory in repositoriesDirectories)
         {
