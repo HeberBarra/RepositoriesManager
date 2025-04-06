@@ -14,26 +14,25 @@ public class RepositoryCloner(List<Repository> repositories, string repositories
 {
     private List<Repository> Repositories { get; } = repositories;
     private string RepositoriesDirectory { get; } = repositoriesDirectory;
+    private readonly ProcessStartInfo _cloneProcessStartInfo = new() { FileName = "git" };
 
     public void Clone(Repository repository)
     {
-        throw new NotImplementedException();
+        string repositoryName =
+            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
+
+        _cloneProcessStartInfo.Arguments = repository.RecurseSubmodules
+            ? $"clone --recurse-submodules {repository.Url} {RepositoriesDirectory}/{repositoryName}"
+            : $"clone {repository.Url} {RepositoriesDirectory}/{repositoryName}";
+        Process process = new() { StartInfo = _cloneProcessStartInfo };
+        process.Start();
     }
 
     public void CloneAllRepositories()
     {
         foreach (Repository repository in Repositories)
         {
-            ProcessStartInfo processStartInfo = new() { FileName = "git" };
-            string repositoryName =
-                repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
-
-            processStartInfo.Arguments =
-                $"clone {repository.Url} {RepositoriesDirectory}/{repositoryName}";
-
-            Process process = new();
-            process.StartInfo = processStartInfo;
-            process.Start();
+            Clone(repository);
         }
     }
 }

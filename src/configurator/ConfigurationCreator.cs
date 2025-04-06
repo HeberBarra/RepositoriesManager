@@ -82,9 +82,13 @@ public class ConfigurationCreator(string configurationDirectory) : IConfiguratio
                       "Url": {
                         "description": "The repository's URL that will be used to clone it with Git",
                         "type": "string"
+                      },
+                      "RecurseSubmodules": {
+                        "description": "Whether or not the repository should be cloned using the --recurse-submodules flag"
+                        "type": "boolean"
                       }
                     },
-                    "required": ["Name", "Update", "Update", "ExecutableFile", "Url"]
+                    "required": ["Name", "Update", "Update", "ExecutableFile", "Url", "RecurseSubmodules"]
                   }
                 }
               }

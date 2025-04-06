@@ -12,5 +12,6 @@ public record Repository(
     bool Update,
     string CommitHash,
     string ExecutableFile,
-    Uri Url
+    Uri Url,
+    bool RecurseSubmodules
 );
