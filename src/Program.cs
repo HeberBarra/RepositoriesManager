@@ -8,19 +8,66 @@
 using RepositoriesManager.configurator;
 using RepositoriesManager.repository;
 
-Console.WriteLine(
-    "To avoid problems, please assert that your global .gitignore is properly configured to ignore .hfb_repo_manager.ps1 or .hfb_repo_manager.sh"
-);
+namespace RepositoriesManager;
 
-IConfigurationDirectoryPicker configurationDirectoryPicker = new ConfigurationDirectoryPicker();
-IConfigurator configurator = new Configurator(configurationDirectoryPicker);
+internal abstract class Program
+{
+    public static void Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine(
+                "Please pass as argument one of the following options: --clone-all, --build-all, --install-all, --remove-all, --remove-unknown, --update-all"
+            );
+            return;
+        }
 
-configurator.CreateConfiguration();
-configurator.ReadConfiguration();
-configurator.StartWatchingConfiguration();
+        Console.WriteLine(
+            "To avoid problems, please assert that your global .gitignore is properly configured to ignore .hfb_repo_manager.ps1 or .hfb_repo_manager.sh"
+        );
 
-RepositoryManager repositoryManager = new(
-    configurator.GetRepositories(),
-    configurator.GetRepositoriesDirectory(),
-    configurator.GetTargetInstallDirectory()
-);
+        IConfigurationDirectoryPicker configurationDirectoryPicker =
+            new ConfigurationDirectoryPicker();
+        IConfigurator configurator = new Configurator(configurationDirectoryPicker);
+
+        configurator.CreateConfiguration();
+        configurator.ReadConfiguration();
+        configurator.StartWatchingConfiguration();
+
+        RepositoryManager repositoryManager = new(
+            configurator.GetRepositories(),
+            configurator.GetRepositoriesDirectory(),
+            configurator.GetTargetInstallDirectory()
+        );
+
+        foreach (string arg in args)
+        {
+            switch (arg)
+            {
+                case "--clone-all":
+                    repositoryManager.CloneAllRepositories();
+                    break;
+
+                case "--build-all":
+                    repositoryManager.BuildAllRepositories();
+                    break;
+
+                case "--install-all":
+                    repositoryManager.InstallAllRepositories();
+                    break;
+
+                case "--remove-all":
+                    repositoryManager.RemoveAllRepositories();
+                    break;
+
+                case "--remove-unknown":
+                    repositoryManager.RemoveUnknownRepositories();
+                    break;
+
+                case "--update-all":
+                    repositoryManager.UpdateAllRepositories();
+                    break;
+            }
+        }
+    }
+}
