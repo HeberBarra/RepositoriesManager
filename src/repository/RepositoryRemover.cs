@@ -18,16 +18,57 @@ public class RepositoryRemover(
 
     public void Remove(Repository repository)
     {
-        throw new NotImplementedException();
+        string repositoryName =
+            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
+        try
+        {
+            File.Delete($"{TargetInstallationDirectory}/{repository.ExecutableFile}");
+            Directory.Delete(
+                $"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}",
+                true
+            );
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(
+                $"Couldn't the following repository: {repositoryName}. Error: {e.Message}"
+            );
+        }
     }
 
     public void RemoveAllRepositories()
     {
-        throw new NotImplementedException();
+        foreach (Repository repository in Repositories)
+        {
+            Remove(repository);
+        }
     }
 
     public void RemoveUnknownRepositories()
     {
-        throw new NotImplementedException();
+        string[] repositoriesDirectories = Directory.GetDirectories(RepositoriesDirectory);
+        List<string> repositoriesNames = [];
+        repositoriesNames.AddRange(
+            Repositories.Select(repository =>
+                repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1]
+            )
+        );
+
+        foreach (string repositoryDirectory in repositoriesDirectories)
+        {
+            if (repositoriesNames.Contains(repositoryDirectory))
+                continue;
+
+            try
+            {
+                Directory.Delete(repositoryDirectory, true);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(
+                    $"Couldn't delete the repository: {repositoryDirectory}. Error: {e.Message}"
+                );
+            }
+        }
     }
 }
