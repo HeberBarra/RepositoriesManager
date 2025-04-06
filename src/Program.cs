@@ -24,4 +24,3 @@ RepositoryManager repositoryManager = new(
     configurator.GetRepositoriesDirectory(),
     configurator.GetTargetInstallDirectory()
 );
-repositoryManager.RemoveUnknownRepositories();
