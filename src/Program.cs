@@ -18,3 +18,10 @@ IConfigurator configurator = new Configurator(configurationDirectoryPicker);
 configurator.CreateConfiguration();
 configurator.ReadConfiguration();
 configurator.StartWatchingConfiguration();
+
+RepositoryManager repositoryManager = new(
+    configurator.GetRepositories(),
+    configurator.GetRepositoriesDirectory(),
+    configurator.GetTargetInstallDirectory()
+);
+repositoryManager.RemoveUnknownRepositories();

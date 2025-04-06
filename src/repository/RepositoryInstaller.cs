@@ -19,35 +19,39 @@ public class RepositoryInstaller(
 
     public void Install(Repository repository)
     {
-        throw new NotImplementedException();
+        string repositoryName =
+            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
+        if (
+            repository.ExecutableFile == string.Empty
+            || !File.Exists($"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}")
+        )
+            return;
+
+        if (!Directory.Exists(TargetInstallationDirectory))
+        {
+            Directory.CreateDirectory(TargetInstallationDirectory);
+        }
+
+        try
+        {
+            File.CreateSymbolicLink(
+                $"{TargetInstallationDirectory}/{repository.ExecutableFile}",
+                $"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}"
+            );
+        }
+        catch (IOException e)
+        {
+            Console.WriteLine(
+                $"Couldn't create symbolic link. Either file exists or something else went wrong. Error: {e.Message}"
+            );
+        }
     }
 
     public void InstallAllRepositories()
     {
         foreach (Repository repository in Repositories)
         {
-            if (
-                repository.ExecutableFile == string.Empty
-                || !File.Exists(
-                    $"{RepositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
-                )
-            )
-                continue;
-
-            Directory.CreateDirectory(TargetInstallationDirectory);
-            try
-            {
-                File.CreateSymbolicLink(
-                    $"{TargetInstallationDirectory}/{repository.ExecutableFile}",
-                    $"{RepositoriesDirectory}/{repository.Name}/{repository.ExecutableFile}"
-                );
-            }
-            catch (IOException)
-            {
-                Console.WriteLine(
-                    "Couldn't create symbolic link. Either file exists or something else went wrong."
-                );
-            }
+            Install(repository);
         }
     }
 }

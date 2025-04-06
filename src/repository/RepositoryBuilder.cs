@@ -12,67 +12,61 @@ namespace RepositoriesManager.repository;
 public class RepositoryBuilder(List<Repository> repositories, string repositoriesDirectory)
     : IRepositoryBuilder
 {
-    private const string BuildFileBash = ".hfb_repo_manager.sh";
-    private const string BuildFilePwsh = ".hfb_repo_manager.ps1";
     private List<Repository> Repositories { get; } = repositories;
     private string RepositoriesDirectory { get; } = repositoriesDirectory;
 
+    private const string BuildFileBash = ".hfb_repo_manager.sh";
+    private const string BuildFilePwsh = ".hfb_repo_manager.ps1";
+    private readonly ProcessStartInfo _startInfoBuildBash = new()
+    {
+        FileName = "bash",
+        Arguments = BuildFileBash,
+    };
+
+    private readonly ProcessStartInfo _startInfoBuildPwsh = new()
+    {
+        FileName = "powershell.exe",
+        Arguments = BuildFilePwsh,
+    };
+
     public void Build(Repository repository)
     {
-        throw new NotImplementedException();
+        string repositoryName =
+            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
+        Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repositoryName}");
+        string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
+        Process buildProcess = new();
+
+        if (files.Contains($"{Directory.GetCurrentDirectory()}/{BuildFileBash}"))
+        {
+            buildProcess.StartInfo = _startInfoBuildBash;
+        }
+        else if (files.Contains($"{Directory.GetCurrentDirectory()}/{BuildFilePwsh}"))
+        {
+            buildProcess.StartInfo = _startInfoBuildPwsh;
+        }
+        else
+        {
+            return;
+        }
+
+        try
+        {
+            buildProcess.Start();
+        }
+        catch (System.ComponentModel.Win32Exception e)
+        {
+            Console.WriteLine(
+                $"Couldn't execute build file. Either permission was denied or there's something wrong with the script. Error: {e.Message}"
+            );
+        }
     }
 
     public void BuildAllRepositories()
     {
-        ProcessStartInfo startInfoBuildBash = new()
+        foreach (Repository repository in Repositories)
         {
-            FileName = "bash",
-            Arguments = BuildFileBash,
-        };
-        ProcessStartInfo startInfoBuildPwsh = new()
-        {
-            FileName = "powershell.exe",
-            Arguments = BuildFilePwsh,
-        };
-
-        foreach (
-            string repositoryName in Repositories.Select(repository =>
-                repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1]
-            )
-        )
-        {
-            Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repositoryName}");
-
-            string[] currentDirectoryFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
-
-            Process processBuild = new();
-            if (
-                currentDirectoryFiles.Contains($"{Directory.GetCurrentDirectory()}/{BuildFileBash}")
-            )
-            {
-                processBuild.StartInfo = startInfoBuildBash;
-            }
-            else if (
-                currentDirectoryFiles.Contains($"{Directory.GetCurrentDirectory()}/{BuildFilePwsh}")
-            )
-            {
-                processBuild.StartInfo = startInfoBuildPwsh;
-            }
-            else
-            {
-                return;
-            }
-
-            try
-            {
-                processBuild.Start();
-            }
-            catch (System.ComponentModel.Win32Exception)
-            {
-                Console.WriteLine(
-                    "Couldn't execute build file. Either permission was denied or there's something wrong with the script."
-                );
-            }
+            Build(repository);
         }
     }
 }
