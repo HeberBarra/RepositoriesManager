@@ -1,6 +1,7 @@
 <h1 style="text-align: center" >Repositories Manager</h1>
 
-![GitHub License](https://img.shields.io/github/license/HeberBarra/RepositoriesManager?labelColor=101010)
+![GitHub License](https://img.shields.io/github/license/HeberBarra/RepositoriesManager?logo=GitHub&label=License)
+![Project Top Language](https://img.shields.io/github/languages/top/HeberBarra/RepositoriesManager?label=CSharp)
 
 A Simple C# for managing git repositories with ease.
 
