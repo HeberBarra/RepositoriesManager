@@ -14,6 +14,10 @@ internal abstract class Program
 {
     public static void Main(string[] args)
     {
+        IConfigurationDirectoryPicker configurationDirectoryPicker =
+            new ConfigurationDirectoryPicker();
+        IConfigurator configurator = new Configurator(configurationDirectoryPicker);
+        configurator.CreateConfiguration();
         if (args.Length == 0)
         {
             Console.WriteLine(
@@ -26,11 +30,6 @@ internal abstract class Program
             "To avoid problems, please assert that your global .gitignore is properly configured to ignore .hfb_repo_manager.ps1 or .hfb_repo_manager.sh"
         );
 
-        IConfigurationDirectoryPicker configurationDirectoryPicker =
-            new ConfigurationDirectoryPicker();
-        IConfigurator configurator = new Configurator(configurationDirectoryPicker);
-
-        configurator.CreateConfiguration();
         configurator.ReadConfiguration();
         configurator.StartWatchingConfiguration();
 
