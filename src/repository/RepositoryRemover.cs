@@ -18,20 +18,18 @@ public class RepositoryRemover(
 
     public void Remove(Repository repository)
     {
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
         try
         {
             File.Delete($"{TargetInstallationDirectory}/{repository.ExecutableFile}");
             Directory.Delete(
-                $"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}",
+                $"{RepositoriesDirectory}/{repository.CanonicalName}/{repository.ExecutableFile}",
                 true
             );
         }
         catch (Exception e)
         {
             Console.WriteLine(
-                $"Couldn't the following repository: {repositoryName}. Error: {e.Message}"
+                $"Couldn't remove the following repository: {repository.CanonicalName}. Error: {e.Message}"
             );
         }
     }
@@ -46,17 +44,9 @@ public class RepositoryRemover(
 
     private string GetRepositoryDirectory(Repository repository)
     {
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
-
-        if (RepositoriesDirectory.EndsWith('/'))
-        {
-            return $"{RepositoriesDirectory}{repositoryName}";
-        }
-        else
-        {
-            return $"{RepositoriesDirectory}/{repositoryName}";
-        }
+        return RepositoriesDirectory.EndsWith('/')
+            ? $"{RepositoriesDirectory}{repository.CanonicalName}"
+            : $"{RepositoriesDirectory}/{repository.CanonicalName}";
     }
 
     public void RemoveUnknownRepositories()

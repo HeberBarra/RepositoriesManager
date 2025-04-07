@@ -25,12 +25,9 @@ public class RepositoryUpdater(List<Repository> repositories, string repositorie
         if (!repository.Update)
             return;
 
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
-
         try
         {
-            Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repositoryName}");
+            Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repository.CanonicalName}");
         }
         catch (DirectoryNotFoundException)
         {

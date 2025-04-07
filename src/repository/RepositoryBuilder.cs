@@ -31,9 +31,7 @@ public class RepositoryBuilder(List<Repository> repositories, string repositorie
 
     public void Build(Repository repository)
     {
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
-        Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repositoryName}");
+        Directory.SetCurrentDirectory($"{RepositoriesDirectory}/{repository.CanonicalName}");
         string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
         Process buildProcess = new();
 

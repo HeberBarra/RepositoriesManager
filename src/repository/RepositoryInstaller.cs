@@ -19,11 +19,11 @@ public class RepositoryInstaller(
 
     public void Install(Repository repository)
     {
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
         if (
             repository.ExecutableFile == string.Empty
-            || !File.Exists($"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}")
+            || !File.Exists(
+                $"{RepositoriesDirectory}/{repository.CanonicalName}/{repository.ExecutableFile}"
+            )
         )
             return;
 
@@ -36,7 +36,7 @@ public class RepositoryInstaller(
         {
             File.CreateSymbolicLink(
                 $"{TargetInstallationDirectory}/{repository.ExecutableFile}",
-                $"{RepositoriesDirectory}/{repositoryName}/{repository.ExecutableFile}"
+                $"{RepositoriesDirectory}/{repository.CanonicalName}/{repository.ExecutableFile}"
             );
         }
         catch (IOException e)

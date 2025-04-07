@@ -14,4 +14,7 @@ public record Repository(
     string ExecutableFile,
     Uri Url,
     bool RecurseSubmodules
-);
+)
+{
+    public string CanonicalName => Name != string.Empty ? Name : Url.Segments[^1];
+};

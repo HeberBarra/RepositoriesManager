@@ -18,12 +18,9 @@ public class RepositoryCloner(List<Repository> repositories, string repositories
 
     public void Clone(Repository repository)
     {
-        string repositoryName =
-            repository.Name != string.Empty ? repository.Name : repository.Url.Segments[^1];
-
         _cloneProcessStartInfo.Arguments = repository.RecurseSubmodules
-            ? $"clone --recurse-submodules {repository.Url} {RepositoriesDirectory}/{repositoryName}"
-            : $"clone {repository.Url} {RepositoriesDirectory}/{repositoryName}";
+            ? $"clone --recurse-submodules {repository.Url} {RepositoriesDirectory}/{repository.CanonicalName}"
+            : $"clone {repository.Url} {RepositoriesDirectory}/{repository.CanonicalName}";
         Process process = new() { StartInfo = _cloneProcessStartInfo };
         process.Start();
     }
